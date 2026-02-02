@@ -47,22 +47,6 @@ Infrastructure:
 - Region: Asia South 1 (Mumbai)
 - Containerization: Docker
 
-
-=
-PROJECT STRUCTURE
-=
-
-switch-chatbot/
-├── main.py              # FastAPI backend with Groq integration
-├── knowledge_base.py    # Curated Switch 2 facts and system prompt
-├── requirements.txt     # Python dependencies
-├── Dockerfile           # Container configuration
-├── .dockerignore        # Files to exclude from Docker build
-├── README.txt           # Project documentation (this file)
-└── static/
-    └── index.html       # Fullscreen chat interface
-
-
 =
 INSTALLATION & SETUP
 =
