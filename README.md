@@ -1,18 +1,21 @@
 Project Overview
 ----------------
-An AI-powered chatbot that provides accurate, up-to-date information about 
-the Nintendo Switch 2 console. Built with FastAPI, Groq AI (Llama 3.3 70B), 
+A web search-powered chatbot that provides accurate, real-time information 
+about the Nintendo Switch 2 console. Built with FastAPI, Tavily Search API, 
 and deployed on Google Cloud Run.
+
 
 FEATURES
 =
 
-✓ Accurate Knowledge Base: Curated information about Switch 2 specs, pricing, and games
-✓ AI-Powered Responses: Uses Groq's Llama 3.3 70B model (FREE)
-✓ Hallucination Prevention: Strict prompt engineering to prevent misinformation
+✓ Real-Time Information: Always up-to-date with live web search results
+✓ Accurate Knowledge Base: Curated specs for instant technical answers
+✓ Web Search Integration: Uses Tavily API for current release dates, pricing
+✓ Clean Responses: Direct answers without source clutter
 ✓ Conversation Memory: Maintains context within chat sessions
 ✓ Modern UI: Fullscreen, responsive design with smooth animations
-✓ Fast & Free: Lightning-fast responses with zero API costs
+✓ Fast & Free: 1000 free searches per month with Tavily
+
 
 
 LIVE DEMO
@@ -21,13 +24,14 @@ LIVE DEMO
 Visit: https://switch-chatbot-445337785844.asia-south1.run.app
 
 
+
 TECH STACK
 =
 
 Backend:
 --------
 - Framework: FastAPI 0.109
-- AI Model: Groq (Llama 3.3 70B Versatile)
+- Web Search: Tavily API (1000 free searches/month)
 - Python: 3.11
 - HTTP Server: Uvicorn
 
@@ -45,6 +49,7 @@ Infrastructure:
 - Containerization: Docker
 
 
+
 INSTALLATION & SETUP
 =
 
@@ -53,7 +58,7 @@ Prerequisites:
 - Python 3.11+
 - Docker (for containerization)
 - Google Cloud CLI (for deployment)
-- Groq API Key (free from console.groq.com)
+- Tavily API Key (free from tavily.com)
 
 Local Development:
 ------------------
@@ -65,10 +70,10 @@ Local Development:
 2. Create virtual environment
    python -m venv venv
 
-   *Activate (Linux/Mac)
+   # Activate (Linux/Mac)
    source venv/bin/activate
 
-   *Activate (Windows)
+   # Activate (Windows)
    venv\Scripts\activate
 
 3. Install dependencies
@@ -76,11 +81,11 @@ Local Development:
 
 4. Set environment variable
 
-   *Linux/Mac
-   export GROQ_API_KEY="your_groq_api_key_here"
+   # Linux/Mac
+   export TAVILY_API_KEY="your_tavily_api_key_here"
 
-   *Windows PowerShell
-   $env:GROQ_API_KEY="your_groq_api_key_here"
+   # Windows PowerShell
+   $env:TAVILY_API_KEY="your_tavily_api_key_here"
 
 5. Run the application
    python main.py
@@ -95,7 +100,7 @@ Docker Deployment (Local):
 docker build -t switch-chatbot .
 
 # Run container
-docker run -p 8080:8080 -e GROQ_API_KEY="your_key" switch-chatbot
+docker run -p 8080:8080 -e TAVILY_API_KEY="your_key" switch-chatbot
 
 
 CLOUD DEPLOYMENT (GOOGLE CLOUD RUN)
@@ -105,6 +110,7 @@ Prerequisites:
 --------------
 - GCP account with billing enabled
 - Google Cloud CLI installed and configured
+- Tavily API key from tavily.com
 
 Deploy to Cloud Run:
 --------------------
@@ -121,7 +127,7 @@ gcloud run deploy switch-chatbot \
     --platform managed \
     --region asia-south1 \
     --allow-unauthenticated \
-    --set-env-vars GROQ_API_KEY=your_groq_api_key \
+    --set-env-vars TAVILY_API_KEY=your_tavily_api_key \
     --memory 512Mi \
     --cpu 1 \
     --timeout 300 \
@@ -129,6 +135,7 @@ gcloud run deploy switch-chatbot \
 
 The deployment will return a URL like:
 https://switch-chatbot-xxxxx.asia-south1.run.app
+
 
 
 API ENDPOINTS
@@ -141,13 +148,13 @@ API ENDPOINTS
 
    Request Body:
    {
-     "message": "What are the Switch 2 specs?",
+     "message": "When does it release in India?",
      "session_id": "user_123"
    }
 
    Response:
    {
-     "response": "The Nintendo Switch 2 features...",
+     "response": "The Nintendo Switch 2 launched globally on June 5, 2025...",
      "success": true,
      "session_id": "user_123"
    }
@@ -159,9 +166,9 @@ API ENDPOINTS
    Response:
    {
      "status": "healthy",
-     "provider": "Groq",
-     "model": "llama-3.3-70b-versatile",
+     "provider": "Tavily Web Search",
      "knowledge_base": "loaded",
+     "search_enabled": true,
      "active_sessions": 5
    }
 
@@ -172,3 +179,24 @@ API ENDPOINTS
 4. Knowledge Summary
    -----------------
    GET /api/knowledge
+
+
+HOW IT WORKS
+=
+
+The chatbot uses a hybrid approach:
+
+1. Specs Questions (RAM, CPU, GPU, Storage, etc.)
+   - Answered instantly from the curated knowledge base
+   - No web search needed for technical specifications
+   - Example: "What's the RAM?" → "12GB LPDDR5"
+
+2. Current Information (Release dates, prices, availability, games)
+   - Searches the web in real-time using Tavily API
+   - Returns clean, direct answers without showing sources
+   - Example: "When does it release in India?" → Gets latest info from web
+
+3. Response Format
+   - Clean, conversational answers
+   - No source citations or "Answer:" prefixes
+   - Direct and to the point
