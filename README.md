@@ -4,13 +4,6 @@ An AI-powered chatbot that provides accurate, up-to-date information about
 the Nintendo Switch 2 console. Built with FastAPI, Groq AI (Llama 3.3 70B), 
 and deployed on Google Cloud Run.
 
-Status: Live
-Python Version: 3.11
-Framework: FastAPI 0.109
-AI Provider: Groq (Free)
-Cloud Platform: Google Cloud Run
-
-
 =
 FEATURES
 =
