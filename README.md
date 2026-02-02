@@ -11,9 +11,9 @@ AI Provider: Groq (Free)
 Cloud Platform: Google Cloud Run
 
 
-===============================================================================
+=
 FEATURES
-===============================================================================
+=
 
 ✓ Accurate Knowledge Base: Curated information about Switch 2 specs, pricing, and games
 ✓ AI-Powered Responses: Uses Groq's Llama 3.3 70B model (FREE)
@@ -23,16 +23,16 @@ FEATURES
 ✓ Fast & Free: Lightning-fast responses with zero API costs
 
 
-===============================================================================
+=
 LIVE DEMO
-===============================================================================
+=
 
 Visit: https://switch-chatbot-445337785844.asia-south1.run.app
 
 
-===============================================================================
+=
 TECH STACK
-===============================================================================
+=
 
 Backend:
 --------
@@ -55,9 +55,9 @@ Infrastructure:
 - Containerization: Docker
 
 
-===============================================================================
+=
 PROJECT STRUCTURE
-===============================================================================
+=
 
 switch-chatbot/
 ├── main.py              # FastAPI backend with Groq integration
@@ -70,9 +70,9 @@ switch-chatbot/
     └── index.html       # Fullscreen chat interface
 
 
-===============================================================================
+=
 INSTALLATION & SETUP
-===============================================================================
+=
 
 Prerequisites:
 --------------
@@ -124,9 +124,9 @@ docker build -t switch-chatbot .
 docker run -p 8080:8080 -e GROQ_API_KEY="your_key" switch-chatbot
 
 
-===============================================================================
+=
 CLOUD DEPLOYMENT (GOOGLE CLOUD RUN)
-===============================================================================
+=
 
 Prerequisites:
 --------------
@@ -158,9 +158,9 @@ The deployment will return a URL like:
 https://switch-chatbot-xxxxx.asia-south1.run.app
 
 
-===============================================================================
+=
 API ENDPOINTS
-===============================================================================
+=
 
 1. Chat Endpoint
    -------------
