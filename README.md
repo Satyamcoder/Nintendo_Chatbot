@@ -4,7 +4,6 @@ An AI-powered chatbot that provides accurate, up-to-date information about
 the Nintendo Switch 2 console. Built with FastAPI, Groq AI (Llama 3.3 70B), 
 and deployed on Google Cloud Run.
 
-=
 FEATURES
 =
 
@@ -16,14 +15,12 @@ FEATURES
 ✓ Fast & Free: Lightning-fast responses with zero API costs
 
 
-=
 LIVE DEMO
 =
 
 Visit: https://switch-chatbot-445337785844.asia-south1.run.app
 
 
-=
 TECH STACK
 =
 
@@ -47,7 +44,7 @@ Infrastructure:
 - Region: Asia South 1 (Mumbai)
 - Containerization: Docker
 
-=
+
 INSTALLATION & SETUP
 =
 
@@ -101,7 +98,6 @@ docker build -t switch-chatbot .
 docker run -p 8080:8080 -e GROQ_API_KEY="your_key" switch-chatbot
 
 
-=
 CLOUD DEPLOYMENT (GOOGLE CLOUD RUN)
 =
 
@@ -135,7 +131,6 @@ The deployment will return a URL like:
 https://switch-chatbot-xxxxx.asia-south1.run.app
 
 
-=
 API ENDPOINTS
 =
 
