@@ -3,10 +3,10 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from groq import Groq
+from tavily import TavilyClient
 import os
 from pathlib import Path
-from knowledge_base import SWITCH_2_KNOWLEDGE, SYSTEM_PROMPT
+from knowledge_base import SWITCH_2_KNOWLEDGE
 
 # Initialize FastAPI
 app = FastAPI(title="Nintendo Switch 2 Chatbot", version="1.0.0")
@@ -20,8 +20,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize Groq client (FREE!)
-client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+# Initialize Tavily search client
+tavily_client = TavilyClient(api_key=os.getenv("TAVILY_API_KEY"))
 
 # Conversation history storage
 conversation_history = {}
@@ -49,47 +49,89 @@ async def read_root():
         return FileResponse(index_file)
     return HTMLResponse(content="<h1>Static files not found</h1>")
 
+def search_web(query: str) -> str:
+    """Search the web using Tavily and return clean answer"""
+    try:
+        search_result = tavily_client.search(
+            query=f"Nintendo Switch 2 {query}",
+            search_depth="advanced",
+            max_results=5,
+            include_answer=True
+        )
+        
+        # Get the direct answer from Tavily
+        if search_result.get('answer'):
+            return search_result['answer']
+        
+        # If no direct answer, extract from top result
+        if search_result.get('results') and len(search_result['results']) > 0:
+            top_result = search_result['results'][0]
+            content = top_result.get('content', '')
+            if content:
+                # Clean up the content - take first meaningful sentence/paragraph
+                sentences = content.split('. ')
+                # Return first 2-3 sentences
+                return '. '.join(sentences[:2]) + '.'
+        
+        return "I couldn't find current information about that. Please try rephrasing your question."
+        
+    except Exception as e:
+        print(f"Search error: {e}")
+        return "I couldn't search for that information right now. Please try again."
+
+def check_knowledge_base(query: str) -> str:
+    """Check if query is about specs that are in knowledge base"""
+    query_lower = query.lower()
+    
+    # Specs keywords that are in knowledge base
+    specs_responses = {
+        "ram": "The Nintendo Switch 2 has 12GB LPDDR5 RAM.",
+        "memory": "The Nintendo Switch 2 has 12GB LPDDR5 RAM.",
+        "cpu": "The Nintendo Switch 2 is powered by the NVIDIA Tegra T239 processor with an 8-core ARM Cortex-A78C CPU running at 2.5GHz.",
+        "processor": "The Nintendo Switch 2 is powered by the NVIDIA Tegra T239 processor with an 8-core ARM Cortex-A78C CPU running at 2.5GHz.",
+        "gpu": "The Nintendo Switch 2 features an NVIDIA Ampere GPU with 1536 CUDA cores, DLSS 2.0 support, and ray tracing capabilities.",
+        "graphics": "The Nintendo Switch 2 features an NVIDIA Ampere GPU with 1536 CUDA cores, DLSS 2.0 support, and ray tracing capabilities.",
+        "storage": "The Nintendo Switch 2 comes with 256GB UFS 3.1 internal storage, expandable via microSD cards up to 2TB.",
+        "display": "The Nintendo Switch 2 has an 8-inch 1080p OLED display with 120Hz capability and HDR support.",
+        "screen": "The Nintendo Switch 2 has an 8-inch 1080p OLED display with 120Hz capability and HDR support.",
+        "battery": "The Nintendo Switch 2 has a 6500mAh battery that provides 4-9 hours of battery life. It supports USB-C Power Delivery with 45W fast charging.",
+        "price": "The Nintendo Switch 2 is priced at $449.99 USD.",
+        "cost": "The Nintendo Switch 2 is priced at $449.99 USD."
+    }
+    
+    for keyword, response in specs_responses.items():
+        if keyword in query_lower:
+            return response
+    
+    return None
+
 @app.post("/chat", response_model=ChatResponse)
 async def chat(question: Question):
-    """Main chat endpoint with Groq AI"""
+    """Main chat endpoint - returns clean answers without sources"""
     try:
         # Initialize conversation history
         if question.session_id not in conversation_history:
             conversation_history[question.session_id] = []
         
-        # Build system prompt
-        system_message = {
-            "role": "system",
-            "content": SYSTEM_PROMPT.format(knowledge_base=SWITCH_2_KNOWLEDGE)
-        }
+        # First check knowledge base for specs
+        kb_answer = check_knowledge_base(question.message)
         
-        # Build messages
-        messages = [system_message]
-        messages.extend(conversation_history[question.session_id][-10:])
+        if kb_answer:
+            response_text = kb_answer
+        else:
+            # Search the web for current information
+            print(f"Searching web for: {question.message}")
+            response_text = search_web(question.message)
+        
+        # Store in history
         user_message = {"role": "user", "content": question.message}
-        messages.append(user_message)
+        assistant_message = {"role": "assistant", "content": response_text}
         
-        # Call Groq API (FREE and FAST!)
-        response = client.chat.completions.create(
-            model="llama-3.3-70b-versatile",  # Best free model
-            messages=messages,
-            max_tokens=600,
-            temperature=0.3,
-            top_p=0.9,
-        )
-        
-        # Extract response
-        assistant_message = response.choices[0].message.content
-        
-        # Update history
         conversation_history[question.session_id].append(user_message)
-        conversation_history[question.session_id].append({
-            "role": "assistant",
-            "content": assistant_message
-        })
+        conversation_history[question.session_id].append(assistant_message)
         
         return ChatResponse(
-            response=assistant_message,
+            response=response_text,
             success=True,
             session_id=question.session_id
         )
@@ -111,9 +153,10 @@ async def health_check():
     """Health check endpoint"""
     return {
         "status": "healthy",
-        "provider": "Groq",
-        "model": "llama-3.3-70b-versatile",
+        "provider": "Tavily Web Search",
         "knowledge_base": "loaded",
+        "search_enabled": True,
+        "ai_model": "None - Direct search answers",
         "active_sessions": len(conversation_history)
     }
 
@@ -122,17 +165,13 @@ async def get_knowledge_summary():
     """Knowledge base summary"""
     return {
         "topics": [
-            "Release Information",
             "Hardware Specifications",
-            "Display Features",
-            "Controllers & Input",
-            "Confirmed Games",
-            "Backward Compatibility",
-            "Comparison with Original Switch"
+            "Real-time Release Information",
+            "Pricing and Availability",
+            "Battery and Charging Details"
         ],
-        "last_updated": "February 2026",
-        "provider": "Groq (Free)",
-        "model": "Llama 3.3 70B"
+        "provider": "Tavily Search API",
+        "response_style": "Clean answers without source citations"
     }
 
 if __name__ == "__main__":
