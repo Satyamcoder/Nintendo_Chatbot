@@ -68,10 +68,10 @@ Local Development:
 2. Create virtual environment
    python -m venv venv
 
-   # Activate (Linux/Mac)
+   *Activate (Linux/Mac)
    source venv/bin/activate
 
-   # Activate (Windows)
+   *Activate (Windows)
    venv\Scripts\activate
 
 3. Install dependencies
@@ -79,10 +79,10 @@ Local Development:
 
 4. Set environment variable
 
-   # Linux/Mac
+   *Linux/Mac
    export GROQ_API_KEY="your_groq_api_key_here"
 
-   # Windows PowerShell
+   *Windows PowerShell
    $env:GROQ_API_KEY="your_groq_api_key_here"
 
 5. Run the application
